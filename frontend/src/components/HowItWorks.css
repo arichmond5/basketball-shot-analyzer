@@ -1,0 +1,11 @@
+.how-it-works {
+  min-height: 110vh;
+  background-color: transparent;
+  padding: 80px 40px;
+}
+
+.how-it-works h2 {
+    font-size: 4rem;
+    padding: 190px;
+    text-align: center;
+}

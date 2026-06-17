@@ -1,7 +1,5 @@
 .hero {
   height: 100vh;
-  background-size: cover;
-  background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,8 +21,10 @@
 }
 
 .uploadButton {
-  max-width: 700px;
-  max-height: 700px;
-  margin-top: 10px;
-  font-size: 1rem;  
+  margin-top: 20px;
+  font-size: 1rem;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
 }

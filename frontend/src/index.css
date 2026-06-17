@@ -52,6 +52,9 @@
 
 body {
   margin: 0;
+  background: url("/heroImage.webp") center/cover fixed no-repeat;
+  color: white;
+  font-family: sans-serif;
 }
 
 #root {

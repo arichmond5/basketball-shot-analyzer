@@ -1,6 +1,11 @@
-// UploadSection.jsx
+import "./HowItWorks.css"
+
 function HowItWorks() {
-  return <></>;
+  return (
+    <section className="how-it-works">
+      <h2>How it works</h2>
+    </section>
+  );
 }
 
 export default HowItWorks;
