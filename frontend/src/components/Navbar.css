@@ -8,12 +8,11 @@ nav {
     align-items: center;
     justify-content: space-between;
 
-    padding: 10px 80px;
+    padding: 0px 80px;
 
-    /* background: rgba(0, 0, 0, 0.3); /* optional */
-    /* backdrop-filter: blur(10px);    /* optional glass effect */ 
+    background: rgba(205, 110, 8, 0.077);
+    backdrop-filter: blur(10px);
     
-    background: transparent;
     z-index: 9999;
     box-sizing: border-box;
 }
@@ -45,14 +44,14 @@ nav {
 }
 
 #navbar li a:hover {
-    color: #d27a00;
+    color: rgba(205, 110, 8);
 }
 
 #navbar li a:hover::after {
     content: "";
     width: 30%;
     height: 2px;
-    background: #d27a00;
+    background: rgba(205, 110, 8);
     position: absolute;
     bottom: -4px;
     left: 20px;
