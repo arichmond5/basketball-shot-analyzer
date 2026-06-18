@@ -3,8 +3,9 @@ import "./About.css";
 function About() {
   return (
     <section className="about" id="about">
-      <div className="about-card">
         <h2>About</h2>
+        
+      <div className="about-card">
 
         <p>
           This application helps basketball players improve their shooting form using computer vision and movement analysis.

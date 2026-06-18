@@ -1,9 +1,12 @@
 .about {
-  min-height: 40vh;
+  min-height: 65vh;
   padding: 20vh 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+}
+
+.about h2 {
+  font-size: 4rem;
+  margin: 0;
 }
 
 .about-card {
@@ -13,7 +16,7 @@
     rgba(255, 90, 0, 0.95)
   );
   color: white;
-
+  margin: 20px auto;
   max-width: 800px;
   padding: 40px;
   border-radius: 16px;
