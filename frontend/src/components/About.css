@@ -1,0 +1,41 @@
+.about {
+  min-height: 80vh;
+  padding: 80px 40px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-card {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 140, 0, 0.95),
+    rgba(255, 90, 0, 0.95)
+  );
+  color: white;
+
+  max-width: 800px;
+  padding: 40px;
+  border-radius: 16px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.about-card h2 {
+  font-size: 4rem;
+  margin: 0 0 20px 0;
+}
+
+.about-card p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.about-card .tech {
+  margin-top: 20px;
+  font-size: 1rem;
+  opacity: 0.8;
+}
