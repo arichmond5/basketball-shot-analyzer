@@ -50,6 +50,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background: url("/heroImage.webp") center/cover fixed no-repeat;

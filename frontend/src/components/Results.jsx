@@ -2,7 +2,7 @@ import "./results.css"
 
 function Results() {
   return (
-    <section className="results">
+    <section className="results" id="results">
       <h2>Your Shot Analysis</h2>
 
       <div className="result-card">
