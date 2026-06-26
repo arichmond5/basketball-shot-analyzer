@@ -1,21 +1,15 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import UploadSection from "./components/UploadSection";
-import HowItWorks from "./components/HowItWorks";
-import Results from "./components/Results";
-import About from "./components/About";
-import Footer from "./components/Footer";
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import UploadPage from "./pages/UploadPage";
+import ResultsPage from "./pages/ResultsPage";
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <HowItWorks />
-      <Results />
-      <About />
-      <Footer />
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/upload" element={<UploadPage />} />
+      <Route path="/results" element={<ResultsPage />} />
+    </Routes>
   );
 }
 

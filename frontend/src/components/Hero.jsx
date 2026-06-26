@@ -1,9 +1,8 @@
-import { useRef } from "react";
 import "./Hero.css";
-import UploadSection from "./UploadSection";"./UploadSection.jsx"
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
-  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   return (
     <section className="hero" id="home">
@@ -14,7 +13,12 @@ function Hero() {
           Analyze your shooting mechanics and receive instant feedback.
         </p>
 
-        <UploadSection />
+        <button
+          className="uploadButton"
+          onClick={() => navigate("/upload")}
+        >
+          Get Started
+        </button>
       </div>
     </section>
   );

@@ -1,24 +1,30 @@
 import { useState } from "react";
-import "./UploadSection.css";
+import { useNavigate } from "react-router-dom";
 
 function UploadSection() {
-  const [video, setVideo] = useState(null);
+  const [file, setFile] = useState(null);
 
-  function handleVideoChange(event) {
-    setVideo(event.target.files[0]);
-  }
+  const navigate = useNavigate();
+
+  const upload = () => {
+    if (!file) return;
+
+    navigate("/results", {
+      state: { file },
+    });
+  };
 
   return (
-    <div className="upload-section">
-      <label className="uploadButton">
+    <div>
+      <input
+        type="file"
+        accept="video/*"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+
+      <button onClick={upload} disabled={!file}>
         Upload Video
-        <input
-          type="file"
-          accept="video/*"
-          onChange={handleVideoChange}
-          hidden
-        />
-      </label>
+      </button>
     </div>
   );
 }

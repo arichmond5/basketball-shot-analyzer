@@ -1,0 +1,34 @@
+.upload-instructions {
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+    padding: 20px;
+    color: #fff;
+    text-align: left;
+}
+
+.upload-instructions h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.upload-instructions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.upload-instructions li {
+    margin-bottom: 12px;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+/* bullet styling */
+.upload-instructions li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #ff6b00;
+    font-weight: bold;
+}
