@@ -14,3 +14,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/snapshots", StaticFiles(directory="snapshots"), name="snapshots")
+app.mount("/overlays", StaticFiles(directory="overlays"), name="overlays")
