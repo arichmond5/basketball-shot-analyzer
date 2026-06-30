@@ -1,0 +1,15 @@
+# Runtime artifacts
+videos/
+overlays/
+snapshots/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Model files
+assets/
