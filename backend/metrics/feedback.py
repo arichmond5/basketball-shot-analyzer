@@ -17,7 +17,6 @@ def generate_feedback(metrics: dict) -> dict:
 
     for phase, joints in metrics.items():
         feedback[phase] = {}
-        print(phase)
 
         for joint, peak in joints.items():
             if joint not in IDEAL:

@@ -6,7 +6,6 @@ PHASE_ANGLE_MAP = {
 
 def compute_shot_metrics(frame_data: list[dict], phases: dict[str, tuple[int, int]]) -> dict[str, dict]:
     metrics = {}
-    print(phases)
 
     for phase, angle_map in PHASE_ANGLE_MAP.items():
         if phase not in phases:

@@ -5,10 +5,10 @@ LM = {
     "left_shoulder":  11, "right_shoulder": 12,
     "left_elbow":     13, "right_elbow":    14,
     "left_wrist":     15, "right_wrist":    16,
+    "left_pinky":     17, "right_pinky":    18,
     "left_hip":       23, "right_hip":      24,
     "left_knee":      25, "right_knee":     26,
     "left_ankle":     27, "right_ankle":    28,
-    "left_pinky":     17, "right_pinky":    18,
 }
 
 def analyze_video(file_path: str) -> list[dict]:

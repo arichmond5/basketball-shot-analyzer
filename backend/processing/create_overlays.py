@@ -5,23 +5,24 @@ SNAPSHOT_DIR = "snapshots"
 os.makedirs(SNAPSHOT_DIR, exist_ok=True)
 
 CONNECTIONS = [
-    ("right_shoulder", "right_elbow"), ("right_elbow", "right_wrist"),
-    ("left_shoulder",  "left_elbow"),  ("left_elbow",  "left_wrist"),
     ("right_shoulder", "left_shoulder"),
-    ("right_shoulder", "right_hip"),   ("left_shoulder", "left_hip"),
-    ("right_hip",      "left_hip"),
-    ("right_hip",      "right_knee"),  ("right_knee",  "right_ankle"),
-    ("left_hip",       "left_knee"),   ("left_knee",   "left_ankle"),
+    ("right_shoulder", "right_hip"),
+    ("left_shoulder", "left_hip"),
+    ("right_hip", "left_hip"),
+    ("right_hip", "right_knee"),
+    ("right_knee", "right_ankle"),
+    ("left_hip", "left_knee"),
+    ("left_knee", "left_ankle"),
 ]
 
 LM = {
     "left_shoulder":  11, "right_shoulder": 12,
     "left_elbow":     13, "right_elbow":    14,
     "left_wrist":     15, "right_wrist":    16,
+    "left_pinky":     17, "right_pinky":    18,
     "left_hip":       23, "right_hip":      24,
     "left_knee":      25, "right_knee":     26,
     "left_ankle":     27, "right_ankle":    28,
-    "left_pinky":     17, "right_pinky":    18,
 }
 
 def pick_snapshot_frame(phase_frames: list[dict], phase: str) -> dict:
@@ -31,26 +32,60 @@ def pick_snapshot_frame(phase_frames: list[dict], phase: str) -> dict:
     elif phase == "SET_POINT":
         return min(phase_frames, key=lambda f: f["angles"].get("elbow", 180))
     elif phase == "FOLLOW_THROUGH":
-        return min(phase_frames, key=lambda f: f["landmarks"].get("right_elbow", {}).get("y", 1))
+        candidates = [
+            f for f in phase_frames
+            if f["landmarks"]["right_elbow"]["y"]
+               < f["landmarks"]["right_shoulder"]["y"]
+        ]
+
+        if candidates:
+            return max(candidates, key=lambda f: f["angles"].get("elbow", 0))
+
+        # Fallback if no frame has elbow above shoulder
+        return max(phase_frames, key=lambda f: f["angles"].get("elbow", 0))
     return phase_frames[0]
 
-def draw_overlay(frame, landmarks: dict, w: int, h: int):
-    for a, b in CONNECTIONS:
+def draw_overlay(frame, landmarks: dict, shooting_side: str, w: int, h: int):
+    connections = CONNECTIONS + [
+        (f"{shooting_side}_shoulder", f"{shooting_side}_elbow"),
+        (f"{shooting_side}_elbow", f"{shooting_side}_wrist"),
+    ]
+    allowed = {
+        f"{shooting_side}_shoulder",
+        f"{shooting_side}_elbow",
+        f"{shooting_side}_wrist",
+        "left_shoulder",
+        "right_shoulder",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle",
+    }
+
+    for a, b in connections:
         if a not in landmarks or b not in landmarks:
             continue
-        if landmarks[a]["visibility"] < 0.3 or landmarks[b]["visibility"] < 0.3:
+        if landmarks[a]["visibility"] < 0.75 or landmarks[b]["visibility"] < 0.75:
             continue
+
         pa = (int(landmarks[a]["x"] * w), int(landmarks[a]["y"] * h))
         pb = (int(landmarks[b]["x"] * w), int(landmarks[b]["y"] * h))
         cv2.line(frame, pa, pb, (200, 200, 200), 2, cv2.LINE_AA)
 
     for name, lm in landmarks.items():
-        if lm["visibility"] < 0.3:
+        if name not in allowed:
             continue
+
+        if lm["visibility"] < 0.75:
+            continue
+
         px = int(lm["x"] * w)
         py = int(lm["y"] * h)
+
         cv2.circle(frame, (px, py), 5, (255, 255, 255), -1, cv2.LINE_AA)
-        cv2.circle(frame, (px, py), 5, (0, 150, 255),   1,  cv2.LINE_AA)
+        cv2.circle(frame, (px, py), 5, (0, 150, 255), 1, cv2.LINE_AA)
 
 def draw_angles(frame, landmarks: dict, angles: dict, shooting_side: str, w: int, h: int):
     s = shooting_side
@@ -135,7 +170,7 @@ def create_overlay_video_and_snapshots(
 
         if frame_idx in frame_lookup:
             f = frame_lookup[frame_idx]
-            draw_overlay(frame, f["landmarks"], w, h)
+            draw_overlay(frame, f["landmarks"], shooting_side, w, h)
             draw_angles(frame, f["landmarks"], f.get("angles", {}), shooting_side, w, h)
 
             # if this is a snapshot target frame, save it before writing

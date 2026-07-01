@@ -10,10 +10,15 @@
 }
 
 .about-card {
-  background: linear-gradient(
+  /* background: linear-gradient(
     to bottom,
     rgba(255, 140, 0, 0.95),
     rgba(255, 90, 0, 0.95)
+  ); */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 140, 0),
+    rgba(255, 90, 0)
   );
   color: white;
   margin: 20px auto;
