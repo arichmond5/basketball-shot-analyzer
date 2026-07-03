@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import UploadExample from "../components/UploadExample";
 import UploadHeader from "../components/UploadHeader";
 import UploadInstructions from "../components/UploadInstructions";
 import UploadSection from "../components/UploadSection";
@@ -9,7 +10,7 @@ function UploadPage() {
       <Navbar />
       <UploadHeader />
       <UploadInstructions />
-
+      <UploadExample />
       <UploadSection />
     </div>
   );

@@ -25,24 +25,21 @@ LM = {
     "left_ankle":     27, "right_ankle":    28,
 }
 
-def pick_snapshot_frame(phase_frames: list[dict], phase: str) -> dict:
+def pick_snapshot_frame(phase_frames: list[dict], phase: str, shooting_side) -> dict:
     """Pick the most representative frame for each phase."""
     if phase == "LOADING":
         return min(phase_frames, key=lambda f: f["angles"].get("knee", 180))
     elif phase == "SET_POINT":
         return min(phase_frames, key=lambda f: f["angles"].get("elbow", 180))
-    elif phase == "FOLLOW_THROUGH":
-        candidates = [
-            f for f in phase_frames
-            if f["landmarks"]["right_elbow"]["y"]
-               < f["landmarks"]["right_shoulder"]["y"]
-        ]
-
-        if candidates:
-            return max(candidates, key=lambda f: f["angles"].get("elbow", 0))
-
-        # Fallback if no frame has elbow above shoulder
-        return max(phase_frames, key=lambda f: f["angles"].get("elbow", 0))
+    elif phase == "RELEASE":
+        return max(
+            [
+                f for f in phase_frames
+                if f["landmarks"][f"{shooting_side}_elbow"]["y"]
+                < f["landmarks"][f"{shooting_side}_shoulder"]["y"]
+            ],
+            key=lambda f: f["angles"].get("elbow", 0)
+        )
     return phase_frames[0]
 
 def draw_overlay(frame, landmarks: dict, shooting_side: str, w: int, h: int):
@@ -54,6 +51,7 @@ def draw_overlay(frame, landmarks: dict, shooting_side: str, w: int, h: int):
         f"{shooting_side}_shoulder",
         f"{shooting_side}_elbow",
         f"{shooting_side}_wrist",
+        f"{shooting_side}_pinky",
         "left_shoulder",
         "right_shoulder",
         "left_hip",
@@ -158,7 +156,7 @@ def create_overlay_video_and_snapshots(
             if i in frame_lookup
         ]
         if phase_frames:
-            snapshot_targets[phase] = pick_snapshot_frame(phase_frames, phase)["frame_index"]
+            snapshot_targets[phase] = pick_snapshot_frame(phase_frames, phase, shooting_side)["frame_index"]
 
     snapshot_paths = {}
     frame_idx = 0

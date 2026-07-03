@@ -2,7 +2,7 @@ def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
     IDLE           = "IDLE"
     LOADING        = "LOADING"
     SET_POINT      = "SET_POINT"
-    FOLLOW_THROUGH = "FOLLOW_THROUGH"
+    RELEASE        = "RELEASE"
 
     state        = IDLE
     min_knee     = 180.0
@@ -11,12 +11,12 @@ def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
 
     LOAD_THRESHOLD          = 140
     MIN_DIP_THRESHOLD       = 158
-    FOLLOW_THROUGH_THRESHOLD = 120
+    RELEASE_THRESHOLD = 100
 
     phase_frames = {
         LOADING:        [],
         SET_POINT:      [],
-        FOLLOW_THROUGH: [],
+        RELEASE:        [],
     }
 
     for frame in frame_data:
@@ -58,12 +58,12 @@ def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
 
         elif state == SET_POINT:
             phase_frames[SET_POINT].append(frame_idx)
-            if elbow is not None and elbow > FOLLOW_THROUGH_THRESHOLD:
-                state     = FOLLOW_THROUGH
+            if elbow is not None and elbow > RELEASE_THRESHOLD:
+                state     = RELEASE
                 frames_in = 0
 
-        elif state == FOLLOW_THROUGH:
-            phase_frames[FOLLOW_THROUGH].append(frame_idx)
+        elif state == RELEASE:
+            phase_frames[RELEASE].append(frame_idx)
 
     phases = {}
     for phase, frames in phase_frames.items():

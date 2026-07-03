@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./UploadSection.css"
 
 function UploadSection() {
   const [file, setFile] = useState(null);
@@ -15,7 +16,7 @@ function UploadSection() {
   };
 
   return (
-    <div>
+    <div className="upload-button">
       <input
         type="file"
         accept="video/*"

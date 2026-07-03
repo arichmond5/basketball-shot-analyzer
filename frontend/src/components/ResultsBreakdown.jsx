@@ -2,9 +2,9 @@ import { useState } from "react";
 import "./ResultsBreakdown.css";
 
 const PHASE_LABELS = {
-  LOADING: "Dip",
+  DIP: "Dip",
   SET_POINT: "Set Point",
-  FOLLOW_THROUGH: "Follow Through",
+  RELEASE: "Release",
 };
 
 function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
@@ -41,21 +41,44 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
           style={{ width: 320, borderRadius: 8 }}
         />
 
-        {feedback?.[activePhase] && (
+        <h4>Feedback</h4>
+
+        {feedback?.[activePhase] ? (
           <div className="feedback-card">
             {Object.entries(feedback[activePhase]).map(([joint, info]) => (
               <div
                 key={joint}
                 className={`feedback-item ${
-                  info?.status === "good" ? "good" : "bad"
+                  info.status === "good" ? "good" : "bad"
                 }`}
               >
-                <strong>{joint}</strong>:{" "}
-                {info?.angle?.toFixed?.(1) ?? "N/A"}° —{" "}
-                {info?.message ?? ""}
+                <strong>
+                  {joint
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
+                </strong>
+
+                {typeof info.value === "number" && (
+                  <>
+                    : {info.value.toFixed(1)}°
+                    {info.range && (
+                      <>
+                        {" "}
+                        <span className="target-range">
+                          (Target: {info.range[0]}°–{info.range[1]}°)
+                        </span>
+                      </>
+                    )}
+                  </>
+                )}
+
+                <br />
+                <span>{info.message}</span>
               </div>
             ))}
           </div>
+        ) : (
+          <p>No feedback available.</p>
         )}
       </div>
     </div>

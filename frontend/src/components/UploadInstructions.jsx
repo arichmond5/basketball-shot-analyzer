@@ -2,7 +2,7 @@ import "./UploadInstructions.css";
 
 function UploadInstructions() {
   return (
-    <div className="upload-instructions">
+    <div className="upload-card">
       <h2>Recording Instructions</h2>
 
       <ul>

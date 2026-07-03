@@ -1,7 +1,7 @@
 PHASE_ANGLE_MAP = {
     "LOADING":        {"knee": "min", "trunk_lean": "max"},
-    "SET_POINT":   {"elbow": "min", "trunk_lean": "max"},
-    "FOLLOW_THROUGH": {"wrist": "min", "trunk_lean": "max"},
+    "SET_POINT":   {"elbow": "min"},
+    "RELEASE": {"wrist": "min"}
 }
 
 def compute_shot_metrics(frame_data: list[dict], phases: dict[str, tuple[int, int]]) -> dict[str, dict]:
