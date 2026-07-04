@@ -78,3 +78,16 @@
   border-left: 4px solid #e74c3c;
   color: #e74c3c;
 }
+
+.feedback-item.good {
+  border-left: 4px solid #2ecc71;
+}
+
+.feedback-item.uncertain {
+  border-left: 4px solid #f39c12;
+  background: rgba(243, 156, 18, 0.08);
+}
+
+.feedback-item.bad {
+  border-left: 4px solid #e74c3c;
+}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./ResultsBreakdown.css";
 
 const PHASE_LABELS = {
-  DIP: "Dip",
+  LOADING: "Loading",
   SET_POINT: "Set Point",
   RELEASE: "Release",
 };
@@ -13,6 +13,19 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
   if (!phases.length) return null;
 
   const [activePhase, setActivePhase] = useState(phases[0]);
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case "good":
+        return "good";
+      case "uncertain":
+        return "uncertain";
+      case "too_low":
+      case "too_high":
+      default:
+        return "bad";
+    }
+  };
 
   return (
     <div>
@@ -48,9 +61,7 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
             {Object.entries(feedback[activePhase]).map(([joint, info]) => (
               <div
                 key={joint}
-                className={`feedback-item ${
-                  info.status === "good" ? "good" : "bad"
-                }`}
+                className={`feedback-item ${getStatusClass(info.status)}`}
               >
                 <strong>
                   {joint
@@ -58,16 +69,14 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
                     .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </strong>
 
-                {typeof info.value === "number" && (
+                {typeof info.angle === "number" && (
                   <>
-                    : {info.value.toFixed(1)}°
-                    {info.range && (
-                      <>
+                    : {info.angle.toFixed(1)}°
+                    {info.ideal && (
+                      <span className="target-range">
                         {" "}
-                        <span className="target-range">
-                          (Target: {info.range[0]}°–{info.range[1]}°)
-                        </span>
-                      </>
+                        (Target: {info.ideal[0]}°–{info.ideal[1]}°)
+                      </span>
                     )}
                   </>
                 )}

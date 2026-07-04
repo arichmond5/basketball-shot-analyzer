@@ -27,7 +27,7 @@ def analyze_video(file_path: str) -> list[dict]:
     if not cap.isOpened():
         return []
 
-    fps        = cap.get(cv2.CAP_PROP_FPS) or 30
+    fps        = 30
     frame_idx  = 0
     frame_data = []
 

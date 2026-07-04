@@ -11,7 +11,7 @@ def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
 
     LOAD_THRESHOLD          = 140
     MIN_DIP_THRESHOLD       = 158
-    RELEASE_THRESHOLD = 100
+    RELEASE_THRESHOLD       = 100
 
     phase_frames = {
         LOADING:        [],

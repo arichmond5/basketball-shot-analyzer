@@ -25,21 +25,55 @@ LM = {
     "left_ankle":     27, "right_ankle":    28,
 }
 
+def dip_score(f, prev_f, shooting_side):
+    knee = f["angles"].get("knee", 180)
+
+    ankle_y = f["landmarks"][f"{shooting_side}_ankle"]["y"]
+    hip_y = f["landmarks"][f"{shooting_side}_hip"]["y"]
+
+    prev_ankle_y = prev_f["landmarks"][f"{shooting_side}_ankle"]["y"]
+    prev_hip_y = prev_f["landmarks"][f"{shooting_side}_hip"]["y"]
+
+    ankle_motion = abs(ankle_y - prev_ankle_y)
+    hip_motion = abs(hip_y - prev_hip_y)
+
+    # high knee bend + ankle stable + hip starting to rise
+    return (180 - knee) - ankle_motion + hip_motion
+
 def pick_snapshot_frame(phase_frames: list[dict], phase: str, shooting_side) -> dict:
     """Pick the most representative frame for each phase."""
+    
+    if not phase_frames:
+        return None
+
     if phase == "LOADING":
-        return min(phase_frames, key=lambda f: f["angles"].get("knee", 180))
-    elif phase == "SET_POINT":
-        return min(phase_frames, key=lambda f: f["angles"].get("elbow", 180))
-    elif phase == "RELEASE":
         return max(
-            [
-                f for f in phase_frames
-                if f["landmarks"][f"{shooting_side}_elbow"]["y"]
-                < f["landmarks"][f"{shooting_side}_shoulder"]["y"]
-            ],
-            key=lambda f: f["angles"].get("elbow", 0)
+            phase_frames,
+            key=lambda f: f["landmarks"][f"{shooting_side}_hip"]["y"]
         )
+    elif phase == "SET_POINT":
+        # tightest elbow set
+        return min(
+            phase_frames,
+            key=lambda f: f["angles"].get("elbow", 180)
+        )
+
+    elif phase == "RELEASE":
+    # 1. find peak wrist frame
+        peak_frame = min(
+            phase_frames,
+            key=lambda f: f["landmarks"][f"{shooting_side}_wrist"]["y"]
+        )
+
+        peak_idx = phase_frames.index(peak_frame)
+
+        target_idx = peak_idx + 4
+
+        if target_idx < len(phase_frames):
+            return phase_frames[target_idx]
+
+        return peak_frame
+
     return phase_frames[0]
 
 def draw_overlay(frame, landmarks: dict, shooting_side: str, w: int, h: int):
@@ -178,6 +212,16 @@ def create_overlay_video_and_snapshots(
                     cv2.imwrite(snap_path, frame)
                     snapshot_paths[phase] = f"http://localhost:8000/snapshots/{file_id}_{phase}.jpg"
 
+        cv2.putText(
+            frame,
+            f"Frame: {frame_idx}",
+            (20, 40),  # top-left corner
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (0, 255, 255),  # yellow
+            2,
+            cv2.LINE_AA,
+        )
         writer.write(frame)
         frame_idx += 1
 
