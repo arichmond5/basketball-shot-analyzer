@@ -1,3 +1,12 @@
+"""
+Computes all necessary (shooting side) angles for accurate analysis.
+
+Including: 
+ - trunk lean
+ - elbow angle
+ - knee bend
+"""
+
 import numpy as np
 
 VISIBILITY_THRESHOLD = 0.75

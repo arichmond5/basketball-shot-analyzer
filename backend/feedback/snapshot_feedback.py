@@ -1,3 +1,9 @@
+"""
+Analyzes keyframe data and compares with "IDEAL" data.
+
+Outputs feedback based on accuracy.
+"""
+
 IDEAL = {
     "LOADING": {
         "knee": (105, 135),

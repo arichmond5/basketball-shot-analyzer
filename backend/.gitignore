@@ -2,6 +2,7 @@
 videos/
 overlays/
 snapshots/
+storage/
 
 # Python
 venv/

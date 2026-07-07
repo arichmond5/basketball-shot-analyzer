@@ -1,3 +1,7 @@
+"""
+Extracts a representative keyframe for each shot phase.
+"""
+
 def get_keyframe_data(
     frame_data: list[dict],
     phases: dict[str, tuple[int, int]],
@@ -17,27 +21,21 @@ def get_keyframe_data(
         if not phase_frames:
             continue
 
-        # --------------------
         # LOADING: max hip y
-        # --------------------
         if phase == "LOADING":
             best_frame = max(
                 phase_frames,
                 key=lambda f: f["landmarks"][f"{shooting_side}_hip"]["y"]
             )
 
-        # --------------------
         # SET_POINT: min elbow angle
-        # --------------------
         elif phase == "SET_POINT":
             best_frame = min(
                 phase_frames,
                 key=lambda f: f["angles"].get("elbow", 180)
             )
 
-        # --------------------
-        # RELEASE: SAME LOGIC AS SNAPSHOT (peak wrist THEN +4 frames)
-        # --------------------
+        # RELEASE: peak wrist then +4 frames
         elif phase == "RELEASE":
             peak_frame = min(
                 phase_frames,

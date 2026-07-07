@@ -1,3 +1,7 @@
+"""
+Finds each phase of a basketball shot (loading, set point, and release) in sequential order.
+"""
+
 def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
     IDLE           = "IDLE"
     LOADING        = "LOADING"
@@ -9,6 +13,7 @@ def shot_segmenter(frame_data: list[dict]) -> dict[str, tuple[int, int]]:
     prev_wrist_y = None
     frames_in    = 0
 
+    #Thresholds used to signify start of phase
     LOAD_THRESHOLD          = 140
     MIN_DIP_THRESHOLD       = 158
     RELEASE_THRESHOLD       = 100

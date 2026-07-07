@@ -1,3 +1,6 @@
+"""
+Extracts landmark values from input video using mediapipe and opencv.
+"""
 import cv2
 import mediapipe as mp
 

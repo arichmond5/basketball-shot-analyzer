@@ -1,3 +1,7 @@
+"""
+Detects shooting side based on visibility of landmarks.
+"""
+
 def detect_shooting_side(frame_data: list[dict]) -> str:
     left_total  = 0.0
     right_total = 0.0

@@ -1,8 +1,11 @@
+"""
+Creates an overlay video and extracts one keyframe per shot phase.
+
+Keyframes are the same as chosen in the keyframe_selector.py file.
+"""
+
 import cv2
 import os
-
-SNAPSHOT_DIR = "snapshots"
-os.makedirs(SNAPSHOT_DIR, exist_ok=True)
 
 CONNECTIONS = [
     ("right_shoulder", "left_shoulder"),
@@ -14,16 +17,6 @@ CONNECTIONS = [
     ("left_hip", "left_knee"),
     ("left_knee", "left_ankle"),
 ]
-
-LM = {
-    "left_shoulder":  11, "right_shoulder": 12,
-    "left_elbow":     13, "right_elbow":    14,
-    "left_wrist":     15, "right_wrist":    16,
-    "left_pinky":     17, "right_pinky":    18,
-    "left_hip":       23, "right_hip":      24,
-    "left_knee":      25, "right_knee":     26,
-    "left_ankle":     27, "right_ankle":    28,
-}
 
 def dip_score(f, prev_f, shooting_side):
     knee = f["angles"].get("knee", 180)
@@ -59,20 +52,18 @@ def pick_snapshot_frame(phase_frames: list[dict], phase: str, shooting_side) -> 
         )
 
     elif phase == "RELEASE":
-    # 1. find peak wrist frame
         peak_frame = min(
             phase_frames,
             key=lambda f: f["landmarks"][f"{shooting_side}_wrist"]["y"]
         )
 
-        peak_idx = phase_frames.index(peak_frame)
+        peak_index = peak_frame["frame_index"]
+        target_index = peak_index + 4
 
-        target_idx = peak_idx + 4
-
-        if target_idx < len(phase_frames):
-            return phase_frames[target_idx]
-
-        return peak_frame
+        return next(
+            (f for f in phase_frames if f["frame_index"] == target_index),
+            peak_frame
+        )
 
     return phase_frames[0]
 
@@ -162,26 +153,27 @@ def draw_angles(frame, landmarks: dict, angles: dict, shooting_side: str, w: int
 
 def create_overlay_video_and_snapshots(
     file_path: str,
-    file_id: str,
+    job_id: str,
     phases: dict,
-    data_frame: list[dict],
-    shooting_side: str
+    frame_data: list[dict],
+    shooting_side: str,
+    snapshot_dir: str,
+    overlay_dir: str
 ) -> tuple[str, dict[str, str]]:
 
-    frame_lookup = {f["frame_index"]: f for f in data_frame}
+    frame_lookup = {f["frame_index"]: f for f in frame_data}
 
     cap = cv2.VideoCapture(file_path)
     w   = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h   = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
 
-    OVERLAY_DIR = "overlays"
-    os.makedirs(OVERLAY_DIR, exist_ok=True)
+    os.makedirs(overlay_dir, exist_ok=True)
+    os.makedirs(snapshot_dir, exist_ok=True)
 
-    out_path = os.path.join(OVERLAY_DIR, f"{file_id}_overlay.mp4")
+    out_path = os.path.join(overlay_dir, f"overlay.mp4")
     writer = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*"avc1"), fps, (w, h))
 
-    # figure out which frame index we want for each phase snapshot ahead of time
     snapshot_targets = {}
     for phase, (start, end) in phases.items():
         phase_frames = [
@@ -190,7 +182,14 @@ def create_overlay_video_and_snapshots(
             if i in frame_lookup
         ]
         if phase_frames:
-            snapshot_targets[phase] = pick_snapshot_frame(phase_frames, phase, shooting_side)["frame_index"]
+            selected = pick_snapshot_frame(
+                phase_frames,
+                phase,
+                shooting_side
+            )
+
+            if selected:
+                snapshot_targets[phase] = selected["frame_index"]
 
     snapshot_paths = {}
     frame_idx = 0
@@ -205,28 +204,19 @@ def create_overlay_video_and_snapshots(
             draw_overlay(frame, f["landmarks"], shooting_side, w, h)
             draw_angles(frame, f["landmarks"], f.get("angles", {}), shooting_side, w, h)
 
-            # if this is a snapshot target frame, save it before writing
             for phase, target_idx in snapshot_targets.items():
                 if frame_idx == target_idx:
-                    snap_path = os.path.join(SNAPSHOT_DIR, f"{file_id}_{phase}.jpg")
+                    snap_path = os.path.join(snapshot_dir, f"{phase}.jpg")
                     cv2.imwrite(snap_path, frame)
-                    snapshot_paths[phase] = f"http://localhost:8000/snapshots/{file_id}_{phase}.jpg"
 
-        cv2.putText(
-            frame,
-            f"Frame: {frame_idx}",
-            (20, 40),  # top-left corner
-            cv2.FONT_HERSHEY_SIMPLEX,
-            1,
-            (0, 255, 255),  # yellow
-            2,
-            cv2.LINE_AA,
-        )
+                    snapshot_paths[phase] = (f"/storage/{job_id}/snapshots/{phase}.jpg")
+
         writer.write(frame)
         frame_idx += 1
 
     cap.release()
     writer.release()
 
-    overlay_url = f"http://localhost:8000/overlays/{file_id}_overlay.mp4"
+    overlay_url = (f"/storage/{job_id}/overlay/overlay.mp4")
+
     return overlay_url, snapshot_paths

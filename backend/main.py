@@ -2,10 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from routes.pose_routes import router as pose_router
+from routes.download import router as download_router
+from scheduler import scheduler
 
 app = FastAPI()
 
 app.include_router(pose_router)
+app.include_router(download_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,5 +18,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/snapshots", StaticFiles(directory="snapshots"), name="snapshots")
-app.mount("/overlays", StaticFiles(directory="overlays"), name="overlays")
+app.mount("/storage", StaticFiles(directory="storage"), name="storage")
