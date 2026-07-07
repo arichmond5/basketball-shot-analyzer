@@ -12,7 +12,7 @@ function About() {
         </p>
 
         <p>
-          It detects key body mechanics such as posture, balance, and release timing to provide actionable feedback.
+          It detects key body mechanics such as posture, leg drive, and elbow extension to provide actionable feedback.
         </p>
 
         <p>

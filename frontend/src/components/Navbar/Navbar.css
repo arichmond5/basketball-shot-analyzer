@@ -9,9 +9,6 @@ nav {
     justify-content: space-between;
 
     padding: 0px 80px;
-
-    background: rgba(205, 110, 8, 0.077);
-    backdrop-filter: blur(10px);
     
     z-index: 9999;
     box-sizing: border-box;

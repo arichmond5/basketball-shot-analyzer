@@ -27,7 +27,7 @@ function UploadInstructions() {
         </li>
 
         <li>
-          Keep the camera completely still (no panning or following the ball).
+          Keep the camera completely still at chest level, (no panning or following the ball).
         </li>
 
         <li>

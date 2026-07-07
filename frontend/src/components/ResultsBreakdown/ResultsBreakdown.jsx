@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./ResultsBreakdown.css";
 
 const PHASE_LABELS = {
@@ -10,9 +10,16 @@ const PHASE_LABELS = {
 function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
   const phases = Object.keys(snapshots);
 
-  if (!phases.length) return null;
+  const [activePhase, setActivePhase] = useState(null);
 
-  const [activePhase, setActivePhase] = useState(phases[0]);
+  // ✅ ensure active tab always exists after data loads
+  useEffect(() => {
+    if (phases.length && !activePhase) {
+      setActivePhase(phases[0]);
+    }
+  }, [phases, activePhase]);
+
+  if (!phases.length || !activePhase) return null;
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -20,8 +27,6 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
         return "good";
       case "uncertain":
         return "uncertain";
-      case "too_low":
-      case "too_high":
       default:
         return "bad";
     }
@@ -49,7 +54,7 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
         <h3>{PHASE_LABELS[activePhase] || activePhase}</h3>
 
         <img
-          src={snapshots[activePhase]}
+          src={`http://localhost:8000${snapshots[activePhase]}`}
           alt={activePhase}
           style={{ width: 320, borderRadius: 8 }}
         />

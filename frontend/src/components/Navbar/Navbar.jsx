@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "../assets/LEBRON.jpeg";
+import logo from "../../assets/BasketballLogo.jpeg";
 import "./Navbar.css";
 
 function Navbar() {
@@ -8,7 +8,9 @@ function Navbar() {
 
       {/* Logo */}
       <div className="logo">
-        <img src={logo} alt="Logo" />
+        <Link to="/">
+          <img src={logo} alt="Logo" />
+        </Link>
       </div>
 
       {/* Nav links */}

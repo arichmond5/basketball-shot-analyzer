@@ -1,0 +1,22 @@
+.expired-page {
+  min-height: 100vh;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 1);
+}
+
+.expired-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 80px);
+  text-align: center;
+  padding: 20px;
+}
+
+.expired-message h1 {
+  font-size: 2rem;
+}
+
+.expired-message p {
+  font-size: 1.1rem;
+}

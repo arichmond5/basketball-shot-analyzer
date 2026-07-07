@@ -9,6 +9,7 @@ function HowItWorks() {
         <div className="step">
           <h3>Upload Your Shot</h3>
           <p>Upload a video of your basketball jump shot.</p>
+          <img src="/UploadPhoto.jpeg" alt="Upload your shot" />
         </div>
 
         <div className="step">
@@ -17,6 +18,7 @@ function HowItWorks() {
             The system detects your body keypoints using computer vision
             to map your shooting form.
           </p>
+          <img src="/AnalysisPhoto.jpeg" alt="AI movement tracking" />
         </div>
 
         <div className="step">
@@ -24,6 +26,7 @@ function HowItWorks() {
           <p>
             Receive breakdown of your shooting mechanics and improvement tips.
           </p>
+          <img src="/FeedbackPhoto.png" alt="Feedback dashboard" />
         </div>
       </div>
     </section>
