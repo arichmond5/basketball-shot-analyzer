@@ -5,6 +5,7 @@ from routes.pose_routes import router as pose_router
 from routes.download import router as download_router
 from scheduler import scheduler
 
+
 app = FastAPI()
 
 app.include_router(pose_router)
@@ -12,7 +13,10 @@ app.include_router(download_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://basketball-analyzer.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

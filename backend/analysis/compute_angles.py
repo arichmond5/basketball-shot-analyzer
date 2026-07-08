@@ -35,7 +35,7 @@ def compute_trunk_lean(shoulder: dict, hip: dict) -> float:
     dy = hip["y"] - shoulder["y"]
     if dy == 0:
         return 0.0
-    return float(abs(np.degrees(np.arctan2(dx, dy))))
+    return float(np.degrees(np.arctan2(dx, dy)))
 
 def compute_angles(frame_data: list[dict], shooting_side: str = "right") -> list[dict]:
 
