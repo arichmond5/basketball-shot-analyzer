@@ -321,10 +321,10 @@ http://localhost:5173
 # 📈 Future Improvements
 
 - Use ML to find shot segments instead of basic pose guidelines
-- Add shot accuracy tracking
+- Allow different camera angles/less instructions to follow for accurate feedback
 - Compare mechanics against professional shooting forms
 - Add historical shot analysis dashboards/Add account tracking
-- Improve feedback personalization using machine learning
+- Improve guidelines for the "perfect shot"
 
 ---
 
