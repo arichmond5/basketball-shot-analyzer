@@ -172,7 +172,15 @@ def create_overlay_video_and_snapshots(
     os.makedirs(snapshot_dir, exist_ok=True)
 
     out_path = os.path.join(overlay_dir, f"overlay.mp4")
-    writer = cv2.VideoWriter(out_path, cv2.VideoWriter_fourcc(*"avc1"), fps, (w, h))
+    writer = cv2.VideoWriter(
+        out_path,
+        cv2.VideoWriter_fourcc(*"mp4v"),
+        fps,
+        (w, h)
+    )
+
+    if not writer.isOpened():
+        raise RuntimeError("Could not open video writer")
 
     snapshot_targets = {}
     for phase, (start, end) in phases.items():
