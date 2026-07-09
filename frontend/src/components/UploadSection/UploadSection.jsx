@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./UploadSection.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function UploadSection() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -17,7 +19,7 @@ function UploadSection() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("http://localhost:8000/upload-and-analyze", {
+      const res = await fetch(`${API_URL}/upload-and-analyze`, {
         method: "POST",
         body: formData,
       });

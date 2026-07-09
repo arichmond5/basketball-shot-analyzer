@@ -9,7 +9,7 @@ function HowItWorks() {
         <div className="step">
           <h3>Upload Your Shot</h3>
           <p>Upload a video of your basketball jump shot.</p>
-          <img src="/UploadPhoto.jpeg" alt="Upload your shot" />
+          <img src="/UploadPhoto.jpg" alt="Upload your shot" />
         </div>
 
         <div className="step">

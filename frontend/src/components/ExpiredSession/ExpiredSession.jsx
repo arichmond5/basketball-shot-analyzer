@@ -12,6 +12,9 @@ function ExpiredSession() {
           These results are no longer available or the link is invalid.
           Please upload your video again.
         </p>
+        <a href="/">
+          Return Home
+        </a>
       </div>
     </div>
   );

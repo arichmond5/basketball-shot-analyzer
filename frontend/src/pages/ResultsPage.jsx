@@ -10,6 +10,8 @@ import ExpirationTimer from "../components/ExpirationTimer/ExpirationTimer";
 import ExpiredSession from "../components/ExpiredSession/ExpiredSession";
 import NotFound from "./ErrorPage";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function ResultsPage() {
   const { jobId } = useParams();
 
@@ -23,7 +25,7 @@ function ResultsPage() {
     const fetchResults = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/results/${jobId}`
+          `${API_URL}/results/${jobId}`
         );
 
         if (res.status === 404) {

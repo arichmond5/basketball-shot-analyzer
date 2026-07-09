@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./ResultsBreakdown.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const PHASE_LABELS = {
   LOADING: "Loading",
   SET_POINT: "Set Point",
@@ -54,7 +56,7 @@ function ResultsBreakdown({ snapshots = {}, feedback = {} }) {
         <h3>{PHASE_LABELS[activePhase] || activePhase}</h3>
 
         <img
-          src={`http://localhost:8000${snapshots[activePhase]}`}
+          src={`${API_URL}${snapshots[activePhase]}`}
           alt={activePhase}
           style={{ width: 320, borderRadius: 8 }}
         />

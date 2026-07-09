@@ -1,11 +1,13 @@
 import "./DownloadResults.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function DownloadResults({ jobId }) {
   return (
     <div className="button-container">
       <a
         className="downloadButton"
-        href={`http://localhost:8000/download/${jobId}`}
+        href={`${API_URL}/download/${jobId}`}
       >
         <span className="downloadIcon">⬇</span>
         Download Results
