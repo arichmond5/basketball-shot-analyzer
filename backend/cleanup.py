@@ -14,6 +14,9 @@ def cleanup_expired_jobs():
         job_path = os.path.join(storage_path, job_id)
         result_file = os.path.join(job_path, "result.json")
 
+        if not os.path.exists(result_file):
+            continue
+
         with open(result_file, "r") as f:
             result = json.load(f)
         
