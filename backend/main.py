@@ -4,7 +4,9 @@ from fastapi.staticfiles import StaticFiles
 from routes.pose_routes import router as pose_router
 from routes.download import router as download_router
 from scheduler import scheduler
+import os
 
+os.makedirs("storage", exist_ok=True)
 
 app = FastAPI()
 
@@ -15,7 +17,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://basketball-analyzer.vercel.app"
+        "https://basketball-shot-analyzer.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
