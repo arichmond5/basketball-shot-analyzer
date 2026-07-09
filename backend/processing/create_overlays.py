@@ -6,6 +6,7 @@ Keyframes are the same as chosen in the keyframe_selector.py file.
 
 import cv2
 import os
+import subprocess
 
 CONNECTIONS = [
     ("right_shoulder", "left_shoulder"),
@@ -18,22 +19,11 @@ CONNECTIONS = [
     ("left_knee", "left_ankle"),
 ]
 
-def dip_score(f, prev_f, shooting_side):
-    knee = f["angles"].get("knee", 180)
-
-    ankle_y = f["landmarks"][f"{shooting_side}_ankle"]["y"]
-    hip_y = f["landmarks"][f"{shooting_side}_hip"]["y"]
-
-    prev_ankle_y = prev_f["landmarks"][f"{shooting_side}_ankle"]["y"]
-    prev_hip_y = prev_f["landmarks"][f"{shooting_side}_hip"]["y"]
-
-    ankle_motion = abs(ankle_y - prev_ankle_y)
-    hip_motion = abs(hip_y - prev_hip_y)
-
-    # high knee bend + ankle stable + hip starting to rise
-    return (180 - knee) - ankle_motion + hip_motion
-
-def pick_snapshot_frame(phase_frames: list[dict], phase: str, shooting_side) -> dict:
+def pick_snapshot_frame(
+    phase_frames: list[dict],
+    phase: str,
+    shooting_side: str
+) -> dict | None:
     """Pick the most representative frame for each phase."""
     
     if not phase_frames:
@@ -59,33 +49,23 @@ def pick_snapshot_frame(phase_frames: list[dict], phase: str, shooting_side) -> 
 
         peak_index = peak_frame["frame_index"]
         target_index = peak_index + 4
+        future_frames = [
+            f for f in phase_frames
+            if f["frame_index"] >= target_index
+        ]
 
-        return next(
-            (f for f in phase_frames if f["frame_index"] == target_index),
-            peak_frame
-        )
+        return future_frames[0] if future_frames else peak_frame
 
     return phase_frames[0]
 
-def draw_overlay(frame, landmarks: dict, shooting_side: str, w: int, h: int):
-    connections = CONNECTIONS + [
-        (f"{shooting_side}_shoulder", f"{shooting_side}_elbow"),
-        (f"{shooting_side}_elbow", f"{shooting_side}_wrist"),
-    ]
-    allowed = {
-        f"{shooting_side}_shoulder",
-        f"{shooting_side}_elbow",
-        f"{shooting_side}_wrist",
-        f"{shooting_side}_pinky",
-        "left_shoulder",
-        "right_shoulder",
-        "left_hip",
-        "right_hip",
-        "left_knee",
-        "right_knee",
-        "left_ankle",
-        "right_ankle",
-    }
+def draw_overlay(
+    frame,
+    landmarks: dict,
+    connections: list[tuple[str, str]],
+    allowed: set[str],
+    w: int,
+    h: int
+):
 
     for a, b in connections:
         if a not in landmarks or b not in landmarks:
@@ -164,23 +144,73 @@ def create_overlay_video_and_snapshots(
     frame_lookup = {f["frame_index"]: f for f in frame_data}
 
     cap = cv2.VideoCapture(file_path)
+
+    if not cap.isOpened():
+        raise RuntimeError(f"Could not open video: {file_path}")
     w   = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h   = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
 
+    if fps <= 1:
+        fps = 30
+
     os.makedirs(overlay_dir, exist_ok=True)
     os.makedirs(snapshot_dir, exist_ok=True)
 
-    out_path = os.path.join(overlay_dir, f"overlay.mp4")
-    writer = cv2.VideoWriter(
-        out_path,
-        cv2.VideoWriter_fourcc(*"mp4v"),
-        fps,
-        (w, h)
-    )
+    out_path = os.path.join(overlay_dir, "overlay.mp4")
 
-    if not writer.isOpened():
-        raise RuntimeError("Could not open video writer")
+    try:
+        ffmpeg = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-y",
+
+                # Input raw frames from OpenCV
+                "-f", "rawvideo",
+                "-pix_fmt", "bgr24",
+                "-s", f"{w}x{h}",
+                "-r", str(fps),
+                "-i", "-",
+
+                # No audio
+                "-an",
+
+                # H.264 encoding for browser compatibility
+                "-c:v", "libx264",
+                "-preset", "medium",
+                "-crf", "23",
+                "-pix_fmt", "yuv420p",
+
+                # Makes MP4 start playing faster in browsers
+                "-movflags", "+faststart",
+
+                out_path,
+            ],
+            stdin=subprocess.PIPE,
+        )
+    except FileNotFoundError:
+        raise RuntimeError("FFmpeg is not installed")
+
+    if ffmpeg.stdin is None:
+        raise RuntimeError("Failed to start FFmpeg")
+
+    connections = CONNECTIONS + [
+        (f"{shooting_side}_shoulder", f"{shooting_side}_elbow"),
+        (f"{shooting_side}_elbow", f"{shooting_side}_wrist"),
+    ]
+
+    allowed = {
+        f"{shooting_side}_elbow",
+        f"{shooting_side}_wrist",
+        "left_shoulder",
+        "right_shoulder",
+        "left_hip",
+        "right_hip",
+        "left_knee",
+        "right_knee",
+        "left_ankle",
+        "right_ankle",
+    }
 
     snapshot_targets = {}
     for phase, (start, end) in phases.items():
@@ -209,21 +239,49 @@ def create_overlay_video_and_snapshots(
 
         if frame_idx in frame_lookup:
             f = frame_lookup[frame_idx]
-            draw_overlay(frame, f["landmarks"], shooting_side, w, h)
+            draw_overlay(
+                frame,
+                f["landmarks"],
+                connections,
+                allowed,
+                w,
+                h
+            )
             draw_angles(frame, f["landmarks"], f.get("angles", {}), shooting_side, w, h)
 
             for phase, target_idx in snapshot_targets.items():
                 if frame_idx == target_idx:
                     snap_path = os.path.join(snapshot_dir, f"{phase}.jpg")
-                    cv2.imwrite(snap_path, frame)
+                    success = cv2.imwrite(snap_path, frame)
+
+                    if not success:
+                        raise RuntimeError(f"Failed to save snapshot: {snap_path}")
 
                     snapshot_paths[phase] = (f"/storage/{job_id}/snapshots/{phase}.jpg")
 
-        writer.write(frame)
+        try:
+            if ffmpeg.poll() is not None:
+                raise RuntimeError("FFmpeg exited unexpectedly")
+
+            ffmpeg.stdin.write(frame.tobytes())
+
+        except (BrokenPipeError, OSError):
+            raise RuntimeError("FFmpeg stopped unexpectedly")
         frame_idx += 1
 
     cap.release()
-    writer.release()
+
+    if ffmpeg.stdin:
+        ffmpeg.stdin.close()
+    return_code = ffmpeg.wait()
+
+    if return_code != 0:
+        if os.path.exists(out_path):
+            os.remove(out_path)
+
+        raise RuntimeError(
+            f"FFmpeg failed with exit code {return_code}"
+        )
 
     overlay_url = (f"/storage/{job_id}/overlay/overlay.mp4")
 
